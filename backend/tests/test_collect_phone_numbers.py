@@ -2,7 +2,7 @@ import pytest
 import httpx
 from fastapi import status
 from uuid import uuid4
-from models.index import PhoneNumberCreate, PhoneNumberUpdate
+from server.models.index import PhoneNumberCreate, PhoneNumberUpdate
 
 # URL for your FastAPI app (change if using different base URL)
 BASE_URL = "http://127.0.0.1:8000/phone_numbers"
