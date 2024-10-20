@@ -2,7 +2,7 @@
 
 A simple set of requirements, involving python backend, ios swift app, and apple watch integrations
 
-### app logic:
+### ecosystem logic:
 - post request crud phone numbers with parameters()
 - LLM data extraction feature
 - backend and local json persistance
