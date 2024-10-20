@@ -3,9 +3,11 @@
 
 # **WARNING: DO NOT OMIT ANYTHING FROM THE FOLLOWING**,
 # if changing add notes be concise to what was done and why
+
+
 # TODO: 
-# - rules for using the numbers: only use one number a day, and the same number twice per week
-# 1. numbers can only be used twice per week then expired for the week session; 
+# - rules for using the numbers: 
+# 1. only use one number twice per day max to avoid flag
 # 2. rename generic `review_gemini_extracted_image_phone_numbers.json` to `review_{ip_address}_gemini_extracted_image_phone_numbers.json`
 # 3. to share numbers with the community
 
