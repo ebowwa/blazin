@@ -12,3 +12,4 @@ blazin.xcodeproj
 app/.build/arm64-apple-macosx/debug/app.build
 app/blazin/blazin.xcodeproj
 .vscode
+app/.build
