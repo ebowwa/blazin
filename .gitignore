@@ -1,0 +1,8 @@
+gemini_flash8b_temp_db.json
+phone_numbers_db.json
+IMG_4332.jpeg
+__pycache__
+.pytest_cache
+.dsstore
+.env
+.DS_Store

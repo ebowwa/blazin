@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Flash-8B Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        textarea, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gemini Flash-8B Phone Number Extraction</h1>
+
+    <!-- Form to Upload Image File -->
+    <h2>Upload Image File</h2>
+    <form id="uploadForm">
+        <label for="imageFile">Select an image file (PNG, JPEG, HEIC, WEBP):</label>
+        <input type="file" id="imageFile" accept="image/png, image/jpeg, image/heic, image/webp" required>
+        
+        <label for="fileName">File Name (optional):</label>
+        <input type="text" id="fileName" placeholder="uploaded_image.jpeg">
+        
+        <button type="button" onclick="uploadImage()">Upload Image</button>
+    </form>
+
+    <!-- Review Extracted Phone Numbers -->
+    <h2>Review Extracted Phone Numbers</h2>
+    <button onclick="reviewNumbers()">Review Numbers</button>
+    <div id="reviewNumbers" class="status"></div>
+
+    <!-- Confirm Phone Numbers -->
+    <h2>Confirm Extracted Phone Numbers</h2>
+    <button onclick="confirmNumbers()">Confirm Numbers</button>
+    <div id="confirmStatus" class="status"></div>
+
+    <!-- Edit Phone Numbers -->
+    <h2>Edit Phone Numbers</h2>
+    <form id="editNumbersForm">
+        <label for="newNumbers">Enter New Phone Numbers (comma-separated):</label>
+        <input type="text" id="newNumbers" placeholder="e.g., 1234567890, 0987654321" required>
+        <button type="button" onclick="editNumbers()">Edit Numbers</button>
+    </form>
+    <div id="editStatus" class="status"></div>
+
+    <!-- Delete Phone Number -->
+    <h2>Delete a Phone Number</h2>
+    <form id="deleteNumberForm">
+        <label for="numberToDelete">Phone Number to Delete:</label>
+        <input type="text" id="numberToDelete" placeholder="e.g., 1234567890" required>
+        <button type="button" onclick="deleteNumber()">Delete Number</button>
+    </form>
+    <div id="deleteStatus" class="status"></div>
+
+    <script>
+        const baseUrl = window.location.origin; // Automatically set to the current server
+
+        async function uploadImage() {
+            const imageFile = document.getElementById('imageFile').files[0];
+            const fileName = document.getElementById('fileName').value || (imageFile ? imageFile.name : 'uploaded_image.jpeg');
+
+            if (!imageFile) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = async function () {
+                const base64String = reader.result.split(',')[1]; // Get Base64 string without the prefix
+
+                try {
+                    const response = await fetch(`${baseUrl}/gemini_flash8b/upload_base64_image/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image_base64: base64String, file_name: fileName })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        alert(`Upload Failed: ${error.detail}`);
+                        return;
+                    }
+
+                    const result = await response.json();
+                    alert(`Upload Success: ${result.detail}`);
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    alert('An error occurred while uploading the image.');
+                }
+            };
+
+            reader.readAsDataURL(imageFile); // Convert image file to Base64 string
+        }
+
+        async function reviewNumbers() {
+    try {
+        const response = await fetch(`${baseUrl}/gemini_flash8b/review_numbers/`);
+        if (!response.ok) {
+            const error = await response.json();
+            document.getElementById('reviewNumbers').innerText = `Error: ${error.detail}`;
+            return;
+        }
+        
+        const result = await response.json();
+
+        // Check if result has any keys (which would be IP addresses)
+        if (Object.keys(result).length === 0) {
+            document.getElementById('reviewNumbers').innerText = "No numbers found to review.";
+            return;
+        }
+
+        // Extract the first IP address key (or handle multiple if needed)
+        const ip = Object.keys(result)[0];
+        const numbers = result[ip];  // Get the list of numbers associated with this IP
+
+        // Display the numbers
+        document.getElementById('reviewNumbers').innerText = `Numbers for IP ${ip}:\n${numbers.join('\n')}`;
+        
+    } catch (error) {
+        console.error('Error reviewing numbers:', error);
+        document.getElementById('reviewNumbers').innerText = 'An error occurred while reviewing numbers.';
+    }
+}
+
+
+        async function confirmNumbers() {
+            try {
+                const response = await fetch(`${baseUrl}/gemini_flash8b/confirm_numbers/`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    document.getElementById('confirmStatus').innerText = `Error: ${error.detail}`;
+                    return;
+                }
+
+                const result = await response.json();
+                document.getElementById('confirmStatus').innerText = `Confirm Status: ${result.detail}`;
+            } catch (error) {
+                console.error('Error confirming numbers:', error);
+                document.getElementById('confirmStatus').innerText = 'An error occurred while confirming numbers.';
+            }
+        }
+
+        async function editNumbers() {
+            const newNumbersInput = document.getElementById('newNumbers').value.trim();
+            if (!newNumbersInput) {
+                alert('Please enter at least one phone number.');
+                return;
+            }
+
+            const newNumbers = newNumbersInput.split(',').map(num => num.trim()).filter(num => num);
+
+            try {
+                const response = await fetch(`${baseUrl}/gemini_flash8b/edit_numbers/`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newNumbers)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    document.getElementById('editStatus').innerText = `Error: ${error.detail}`;
+                    return;
+                }
+
+                const result = await response.json();
+                document.getElementById('editStatus').innerText = `Edit Status: ${result.detail}\nNumbers:\n${result.numbers.join('\n')}`;
+            } catch (error) {
+                console.error('Error editing numbers:', error);
+                document.getElementById('editStatus').innerText = 'An error occurred while editing numbers.';
+            }
+        }
+
+        async function deleteNumber() {
+            const numberToDelete = document.getElementById('numberToDelete').value.trim();
+            if (!numberToDelete) {
+                alert('Please enter a phone number to delete.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${baseUrl}/delete_number/?number_to_delete=${encodeURIComponent(numberToDelete)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    document.getElementById('deleteStatus').innerText = `Error: ${error.detail}`;
+                    return;
+                }
+
+                const result = await response.json();
+                document.getElementById('deleteStatus').innerText = `Delete Status: ${result.detail}\nNumbers:\n${result.numbers.join('\n')}`;
+            } catch (error) {
+                console.error('Error deleting number:', error);
+                document.getElementById('deleteStatus').innerText = 'An error occurred while deleting the number.';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/ebowwa/blazin/app/.build/arm64-apple-macosx/debug/app.build/master.swiftdeps"
+  },
+  "/Users/ebowwa/blazin/app/Sources/main.swift": {
+    "dependencies": "/Users/ebowwa/blazin/app/.build/arm64-apple-macosx/debug/app.build/main.d",
+    "object": "/Users/ebowwa/blazin/app/.build/arm64-apple-macosx/debug/app.build/main.swift.o",
+    "swiftmodule": "/Users/ebowwa/blazin/app/.build/arm64-apple-macosx/debug/app.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/ebowwa/blazin/app/.build/arm64-apple-macosx/debug/app.build/main.swiftdeps"
+  }
+}
